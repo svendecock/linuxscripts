@@ -1,0 +1,114 @@
+## Booting
+# Edit boot options for workaround nouvau drivers
+UEFI boot, 'e' nomodeset
+--
+## Preparing Installation
+# Loadkeys
+loadkeys be-latin1
+# Verify network connectivity
+ifconfig
+ping -c2 google.com
+--
+# Sync NTP
+timedatectl set-ntp true
+timedatectl status
+--
+# Check partition layout
+lsblk
+fdisk -l
+--
+# Creating partitions
+cfdisk (1: 300MB EFI; 2: rest)
+mkfs.btrfs -L "Arch Linux" /dev/sda1
+mkswap /dev/sda2 
+swapon /dev/sda2
+mount /dev/sda1 /mnt
+
+
+
+
+
+--
+# Edit pacman.conf, enable multilib
+nano /etc/pacman.conf
+** uncomment:
+* [multilib]
+* Include = /etc/pacman.d/mirrorlist
+--
+## Installation
+pacstrap -i /mnt base base-devel
+--
+# Generate fstab file, with UUID's
+genfstab -U -p /mnt >> /mnt/etc/fstab
+cat /mnt/etc/fstab
+--
+## Chroot
+arch-chroot /mnt
+--
+# Edit pacman.conf, enable multilib
+nano /etc/pacman.conf
+** uncomment:
+* [multilib]
+* Include = /etc/pacman.d/mirrorlist
+--
+# Install packages
+pacman -S nvidia vim lightdm deepin deepin-extra sudo grub efibootmgr dosfstools  mtools
+--
+# Locales
+nano/etc/locale.conf
+** uncomment:
+* en_US.UTF-8 UTF-8
+locale-gen
+echo LANG=en_US.UTF-8 > /etc/locale.conf
+export LANG=en_US.UTF-8
+LANG=en_US.UTF-8
+--
+# Keyboard map
+nano /etc/vconsole.conf # KEYMAP=be-latin1
+# Set time
+ln -sf /usr/share/zoneinfo/Europe/Brussels /etc/localtime
+hwclock --systohc --utc
+--
+# Set hostname
+echo "arch-zbox" > /etc/hostname
+echo "127.0.0.1 localhost" >> /etc/hosts
+echo "::1 localhost" >> /etc/hosts
+echo "127.0.1.1 arch-zbox.svendecock.com arch-zbox" >> /etc/hosts
+--
+
+# Add and edit users
+passwd
+useradd -m sven
+passwd sven
+usermod -mg users -G wheel,audio,video,optical,storage,power -s /bin/bash sven
+visudo ### uncomment: %wheel ALL=(ALL) ALL
+--
+# Bootloader installation
+mkdir /boot/EFI
+mount /dev/sda1 /boot/EFI
+grub-install --target=x86_64-efi  --bootloader-id=grub_uefi --recheck
+********************************* EDIT GRUB.CONF????
+grub-mkconfig -o /boot/grub/grub.cfg
+--
+# Static network configuration
+ifconfig en*** 192.168.1.52 netmask 255.255.255.0 
+route add default gw 192.168.1.1
+echo “nameserver 8.8.8.8” >> /etc/resolv.conf
+systemctl enable dhcpcd #??
+--
+# Swap file:
+truncate -s 0 /swapfile
+chattr +C /swapfile
+btrfs property set /swapfile compression none
+fallocate -l 2G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo "/swapfile none swap defaults 0 0" >> /etc/fstab
+--
+# Edit swappiness behaviour
+nano /etc/sysctl.d/99-swappiness.conf # vm.swappiness=10
+--
+## Unmount & reboot machine
+umount -a
+reboot now
