@@ -92,9 +92,8 @@ visudo ### uncomment: %wheel ALL=(ALL) ALL
 # Bootloader installation
 mkdir /boot/EFI
 mount /dev/sda1 /boot/EFI
-grub-install --target=x86_64-efi  --bootloader-id=grub_uefi --recheck
-********************************* EDIT GRUB.CONF????
 grub-mkconfig -o /boot/grub/grub.cfg
+grub-install --target=x86_64-efi  --bootloader-id=grub_uefi --recheck
 --
 # Static network configuration
 ifconfig en*** 192.168.1.52 netmask 255.255.255.0 
