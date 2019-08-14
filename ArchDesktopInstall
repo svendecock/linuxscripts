@@ -1,5 +1,5 @@
 ## Booting
-# Edit boot options for workaround nouvau drivers
+# Edit boot options for workaround nouveau drivers
 UEFI boot, 'e' nomodeset
 --
 ## Preparing Installation
@@ -20,14 +20,20 @@ fdisk -l
 # Creating partitions
 cfdisk (1: 300MB EFI; 2: rest)
 mkfs.btrfs -L "Arch Linux" /dev/sda1
-mkswap /dev/sda2 
-swapon /dev/sda2
 mount /dev/sda1 /mnt
-
-
-
-
-
+cd /mnt
+btrfs subvolume create ROOT
+cd
+umount /dev/sda1
+mount -o ssd,compress=lzo,noatime,subvol=ROOT /dev/sda1 /mnt
+btrfs subvolume create home
+btrfs subvolume create root
+btrfs subvolume create etc
+btrfs subvolume create mnt
+btrfs subvolume create opt
+btrfs subvolume create var
+btrfs subvolume create tmp
+btrfs subvolume create boot
 --
 # Edit pacman.conf, enable multilib
 nano /etc/pacman.conf
@@ -36,7 +42,7 @@ nano /etc/pacman.conf
 * Include = /etc/pacman.d/mirrorlist
 --
 ## Installation
-pacstrap -i /mnt base base-devel
+pacstrap -i /mnt base base-devel btrfs-progs
 --
 # Generate fstab file, with UUID's
 genfstab -U -p /mnt >> /mnt/etc/fstab
