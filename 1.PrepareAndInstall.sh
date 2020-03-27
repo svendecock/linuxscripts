@@ -19,7 +19,7 @@ parted /dev/nvme0n1 mklabel gpt \
                     set 1 esp on \
                     mkpart primary btrfs 512MiB 100%
 mkfs.fat -F32 /dev/nvme0n1p1                    
-mkfs.btrfs -L "Arch Linux" /dev/nvme0n1p2
+mkfs.btrfs -L "ArchLinux" /dev/nvme0n1p2
 mount /dev/nvme0n1p2 /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
