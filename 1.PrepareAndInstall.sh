@@ -35,8 +35,8 @@ umount /mnt
 mount -o ssd,compress=lzo,noatime,subvol=@ /dev/nvme0n1p2 /mnt
 mkdir -p /mnt/{var/log,home,.snapshots}
 mount -o ssd,compress=lzo,noatime,subvol=@home /dev/nvme0n1p2 /mnt/home
-mount -o ssd,compress=lzo,noatime,subvol=@logs /dev/nvme0n1p2 /mnt/var/log
-mount -o ssd,compress=lzo,noatime,subvol=@snapshots /dev/nvme0n1p2 /mnt/snapshots
+mount -o ssd,compress=lzo,noatime,subvol=@log /dev/nvme0n1p2 /mnt/var/log
+mount -o ssd,compress=lzo,noatime,subvol=@snapshots /dev/nvme0n1p2 /mnt/.snapshots
 --
 # Add multilib to pacman
 echo "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
