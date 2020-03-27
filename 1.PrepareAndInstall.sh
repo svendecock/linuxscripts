@@ -39,3 +39,12 @@ pacstrap -i /mnt base base-devel btrfs-progs
 # Generate fstab file, with UUID's
 genfstab -U -p /mnt >> /mnt/etc/fstab
 cat /mnt/etc/fstab
+#Installation done
+#Get second script and put in location
+wget -O chroot.sh https://raw.githubusercontent.com/svendecock/linuxscripts/master/2.Chroot
+mv chroot.sh /mnt/chroot.sh
+chmod +x /mnt/chroot.sh
+#Run second script in chrooted install
+arch-chroot /mnt ./chroot.sh
+#Copy logfile
+cp log.txt /mnt/log.txt
