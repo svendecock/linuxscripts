@@ -1,1 +1,59 @@
+# Add multilib to pacman
+echo "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
+# Install extra packages
+pacman -S vim nano sudo grub efibootmgr dosfstools  mtools plasma plasma-wayland-session git go grml-zsh-config
+# Add and edit users
+echo "Password for root:"
+passwd
+chsh -s /bin/zsh
+useradd -m sven
+echo "Password for sven:"
+passwd sven
+usermod -mg users -G wheel,audio,video,optical,storage,power -s /bin/zsh sven
+echo -e "%wheel ALL=(ALL) ALL" > /etc/sudoers.d/99_wheel
+#echo -e "%wheel ALL=(ALL) ALL\nDefaults rootpw" > /etc/sudoers.d/99_wheel
+#Install yay (after non priv user!)
+cd /home/sven
+sudo -u sven git clone https://aur.archlinux.org/yay.git
+cd yay
+sudo -u sven makepkg -si
+cd /
 
+
+# Locales
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.conf
+nano/etc/locale.conf
+** uncomment:
+* en_US.UTF-8 UTF-8
+locale-gen
+echo LANG=en_US.UTF-8 > /etc/locale.conf
+export LANG=en_US.UTF-8
+LANG=en_US.UTF-8
+--
+# Keyboard map
+nano /etc/vconsole.conf # KEYMAP=be-latin1
+# Set time
+ln -sf /usr/share/zoneinfo/Europe/Brussels /etc/localtime
+hwclock --systohc --utc
+--
+# Set hostname & enable dhcpd
+echo "red-devil" > /etc/hostname
+echo "127.0.0.1 localhost" >> /etc/hosts
+echo "::1 localhost" >> /etc/hosts
+echo "127.0.1.1 red-devil.svendecock.com red-devil" >> /etc/hosts
+systemctl enable dhcpcd
+--
+# Swap file:
+truncate -s 0 /swapfile
+chattr +C /swapfile
+btrfs property set /swapfile compression none
+fallocate -l 4G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo "/swapfile none swap defaults 0 0" >> /etc/fstab
+echo "vm.swappiness=10" >> /etc/sysctl.d/99-swappiness.conf
+--
+# Bootloader installation
+grub-mkconfig -o /boot/grub/grub.cfg
+grub-install --target=x86_64-efi  --bootloader-id=grub_uefi --recheck
