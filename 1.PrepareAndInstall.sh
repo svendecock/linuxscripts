@@ -28,14 +28,15 @@ btrfs subvolume create /mnt/@log
 btrfs subvolume list /mnt
 umount /mnt
 mount -o ssd,compress=lzo,noatime,subvol=@ /dev/nvme0n1p2 /mnt
-mkdir -p /mnt/{var/log,home,.snapshots}
+mkdir -p /mnt/{var/log,/boot/EFI,home,.snapshots}
 mount -o ssd,compress=lzo,noatime,subvol=@home /dev/nvme0n1p2 /mnt/home
 mount -o ssd,compress=lzo,noatime,subvol=@log /dev/nvme0n1p2 /mnt/var/log
 mount -o ssd,compress=lzo,noatime,subvol=@snapshots /dev/nvme0n1p2 /mnt/.snapshots
+mount /dev/nvme0n1 /boot/EFI
 # Add multilib to pacman
 echo "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
 ## Installation
-pacstrap -i /mnt base base-devel btrfs-progs
+pacstrap /mnt base base-devel btrfs-progs
 # Generate fstab file, with UUID's
 genfstab -U -p /mnt >> /mnt/etc/fstab
 cat /mnt/etc/fstab
