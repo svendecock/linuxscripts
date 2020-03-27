@@ -23,4 +23,5 @@ Create swapfile and disable CoW
 Setup snapper
 Install KDE
 Install GRUB
+Copy log to /mnt
 Reboot to a hopefully working system...
