@@ -25,18 +25,18 @@ parted /dev/nvme0n1 mklabel gpt \
                     mkpart primary btrfs 512MiB 100%
 mkfs.fat -F32 /dev/nvme0n1p1                    
 mkfs.btrfs -L "Arch Linux" /dev/nvme0n1p2
-mount /dev/nvme0n1p1 /mnt
+mount /dev/nvme0n1p2 /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
 btrfs subvolume create /mnt/@snapshots
 btrfs subvolume create /mnt/@log
 btrfs subvolume list /mnt
 umount /mnt
-mount -o ssd,compress=lzo,noatime,subvol=@ /dev/nvme0n1 /mnt
+mount -o ssd,compress=lzo,noatime,subvol=@ /dev/nvme0n1p2 /mnt
 mkdir -p /mnt/{var/log,home,.snapshots}
-mount -o ssd,compress=lzo,noatime,subvol=@home /dev/nvme0n1 /mnt/home
-mount -o ssd,compress=lzo,noatime,subvol=@logs /dev/nvme0n1 /mnt/var/log
-mount -o ssd,compress=lzo,noatime,subvol=@snapshots /dev/nvme0n1 /mnt/snapshots
+mount -o ssd,compress=lzo,noatime,subvol=@home /dev/nvme0n1p2 /mnt/home
+mount -o ssd,compress=lzo,noatime,subvol=@logs /dev/nvme0n1p2 /mnt/var/log
+mount -o ssd,compress=lzo,noatime,subvol=@snapshots /dev/nvme0n1p2 /mnt/snapshots
 --
 # Add multilib to pacman
 echo "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
