@@ -1,23 +1,18 @@
 #!/bin/sh
 ## Booting
---
 ## Preparing Installation
 # Loadkeys
 loadkeys be-latin1
 # Verify network connectivity
 ifconfig
 ping -c2 google.com
---
 # Sync NTP
 timedatectl set-ntp true
---
 # Print UEFI mode
 ls /sys/firmware/efi/efivars
---
 # Print partition layout
 lsblk
 fdisk -l
---
 # Creating partitions
 parted /dev/nvme0n1 mklabel gpt \
                     mkpart primary fat32 1MiB 512MiB \
@@ -37,14 +32,10 @@ mkdir -p /mnt/{var/log,home,.snapshots}
 mount -o ssd,compress=lzo,noatime,subvol=@home /dev/nvme0n1p2 /mnt/home
 mount -o ssd,compress=lzo,noatime,subvol=@log /dev/nvme0n1p2 /mnt/var/log
 mount -o ssd,compress=lzo,noatime,subvol=@snapshots /dev/nvme0n1p2 /mnt/.snapshots
---
 # Add multilib to pacman
 echo "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
---
 ## Installation
 pacstrap -i /mnt base base-devel btrfs-progs
---
 # Generate fstab file, with UUID's
 genfstab -U -p /mnt >> /mnt/etc/fstab
 cat /mnt/etc/fstab
---
